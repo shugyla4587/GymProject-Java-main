@@ -1,0 +1,30 @@
+caption {
+	font-size: 16pt;
+}
+
+.tabela {
+	border: 2px solid black;
+	padding: 5px;
+	width: 130px;
+	margin-left: 12%;
+	text-align: left;
+	
+}
+
+.tabelaPretraga{
+	background-color: white;
+	border-bottom: 2px solid black;
+	border-top: 2px solid black;
+	color: black;
+}
+
+.tabela th{
+	background-color: black;
+	color: white;
+	text-align: left;
+}
+
+.tabela1{
+	margin-left: 20%;
+}
+

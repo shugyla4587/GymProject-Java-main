@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ""  # Замените на свой пароль
+      MYSQL_DATABASE: teretanaowp  # Замените на имя вашей базы данных
+      MYSQL_USER: root # Замените на имя вашего пользователя
+      MYSQL_PASSWORD: ""  # Замените на свой пароль
+    volumes:
+      - mysql_data:/var/lib/mysql  # Сохраняем данные MySQL
+    ports:
+      - "3306:3306"  # Экспонируем порт MySQL
+
+  springboot:
+    build:
+      context: .  # Путь к вашему Dockerfile
+    ports:
+      - "8080:8080"  # Экспонируем порт Spring Boot
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/your_database_name
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+    depends_on:
+      - mysql  # Сначала должен запуститься MySQL
+
+volumes:
+  mysql_data:
+    driver: local

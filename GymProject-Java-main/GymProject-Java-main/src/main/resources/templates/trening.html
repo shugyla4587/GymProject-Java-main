@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/StiloviForma.css}"/>
+	<base th:href="@{/}">
+	<title>Trening</title>
+</head>
+<body>
+	<table class="tabela1" th:if="${session.prijavljeniKorisnik == null}">
+		<tr>
+			<td>
+				<ul>
+					<li><a href="registracija.html">registracija</a></li>
+					<li><a href="login.html">login</a></li>
+					<li><a href="">Treninzi</a></li>    
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<table th:if="${session.prijavljeniKorisnik != null}">
+		<tr>
+			<td>
+			<ul>
+				<li><a href="Korisnici/Logout">logout</a></li>
+				</ul>
+				<ul>
+					<li><a href="">Treninzi</a></li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<form method="post" action="trening/edit" th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'administrator'}">
+		<input type="hidden" name="id" th:value="${trening.id}"/><!-- popuni value atribut vrednošću -->
+		<table class="tabela">
+			<caption>Trening</caption>
+			<tr><th>Naziv:</th><td><input type="text" th:value="${trening.naziv}" name="naziv"/></td></tr>
+			<tr><th>Trener:</th><td><input type="text" th:value="${trening.trener}" name="trener"/></td></tr>
+			<tr><th>Opis:</th><td><input type="text" th:value="${trening.opis}" name="opis"/></td></tr>
+			<tr><th>Slika:</th><td><img th:src="@{${trening.slika}}" style="width:150px;height:150px"></td></tr>
+			<tr>
+				<th>Tip treninga:</th>
+				<td>
+					<th:block th:each="itTipTreninga: ${tipoviTreninga}">
+						<input type="checkbox" name="tipTreningaId" th:value="${itTipTreninga.id}" th:checked="${#lists.contains(trening.tipTreninga, itTipTreninga)}"/><span th:text="${itTipTreninga.ime}"></span><br>
+					</th:block>
+				</td>
+			</tr>			
+			<tr><th>Cena:</th><td><input type="number" min="0" th:value="${trening.cena}" name="cena" required="required"/></td></tr>
+			<tr>
+				<th>Vrsta treninga:</th>
+				<td>
+					<select name="vrstaTreninga">
+       					<option th:each="vt : ${vrsteTreninga}"
+				            th:selected="${vt == trening.vrstaTreninga}" th:value="${vt}" th:text="${vt}">
+				    	</option>
+   					</select>	
+				</td>
+			</tr>
+			<tr>
+				<th>Nivo treninga:</th>
+				<td>
+					<select name="nivoTreninga">
+       					<option th:each="nt : ${nivoiTreninga}"
+				            th:selected="${nt == trening.nivoTreninga}" th:value="${nt}" th:text="${nt}">
+				    	</option>
+   					</select>	
+				</td>
+			</tr>
+			<tr><th>Trajanje:</th><td><input type="time" th:value="${trening.trajanje}" name="trajanje" required="required"/></td></tr>
+			<tr><th>Prosecna ocena:</th><td th:text="${trening.ocena}"></td>
+			<tr><th></th><td><input type="submit" value="Izmeni"/></td></tr>
+		</table>
+	</form>
+		<table class="tabela" th:if="${session.prijavljeniKorisnik == null or session.prijavljeniKorisnik.uloga == 'korisnik'}">
+		<caption>Trening</caption>
+		<tr><th>Naziv:</th><td th:text="${trening.naziv}"></td>
+		<tr><th>Trener:</th><td th:text="${trening.trener}"></td>
+		<tr><th>Opis:</th><td th:text="${trening.opis}"></td>
+		<tr><th>Slika:</th><td><img th:src="@{${trening.slika}}" style="width:150px;height:150px"></td>
+		<tr>
+			<th>Tip treninga:</th>
+			<td>
+				<ul>
+					<li th:each="itTipTreninga: ${trening.tipTreninga}"><a th:text="${itTipTreninga.ime}"></a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr><th>Cena:</th><td th:text="${trening.cena}"></td>
+		<tr><th>Vrsta treninga:</th><td th:text="${trening.vrstaTreninga}"></td>
+		<tr><th>Nivo treninga:</th><td th:text="${trening.nivoTreninga}"></td>
+		<tr><th>Trajanje:</th><td th:text="${trening.trajanje}"></td>
+		<tr><th>Prosecna ocena:</th><td th:text="${trening.ocena}"></td>
+		<tr><th>.</th><td>
+		<form method="post" action="ZeljeniTreninzi/Create" th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'korisnik'}">
+			<input type="hidden" name="id" th:value="${trening.id}"/>
+			<input type="hidden" name="korisnickoIme" th:value="${session.prijavljeniKorisnik.korisnickoIme}"/><br>
+			<input type="submit" value="Dodaj u listu zelja"/>
+		</form>
+		</td>
+	</table>
+	<form th:if="${session.prijavljeniKorisnik != null}">
+	<table>
+	<caption>Komentari</caption>
+		<tr th:each="itKomentar: ${komentari}" th:if="${itKomentar.trening.id == trening.id and itKomentar.statusKomentara == 'odobren'}">
+			<td>
+				<ul>
+					<li><a th:text="${itKomentar.korisnik.ime + '&nbsp;' + itKomentar.korisnik.prezime + ':&nbsp;' + itKomentar.tekst}"></a></li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	</form>
+	<form method="post" action="Komentari/Create" th:if="${session.prijavljeniKorisnik != null}">
+	<input type="hidden" name="korisnickoIme" th:value="${session.prijavljeniKorisnik.korisnickoIme}"/>
+	<input type="hidden" name="treningId" th:value="${trening.id}"/>
+	<table th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'korisnik'}" class="tabela">
+		<caption>Dodaj komentar</caption>
+		<tr><th></th><td><input type="text" name="tekstKomentara" placeholder="Ostavi komentar" required="required"/></td></tr>
+		<tr><th>Ocena:</th><td><input type="number" name="ocena" min="1" max="5" value="1"/></td></tr>
+		<tr><th></th><td><input type="submit" value="Posalji"/></td></tr>
+	</table>
+	</form>
+	<p class="greska" th:text="${poruka}"></p>
+	
+	<table class="tabela">
+		<caption>Termini</caption>
+			<tr>
+				<th>BR.</th>
+				<th>Sala</th>
+				<th>Trening</th>
+				<th>Datum</th>
+				<th th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'korisnik'}">.</th>
+			</tr>
+			<tr th:each="itTermin, status: ${termini}">
+					<td class="broj" th:text="${status.index + 1}"></td>
+					<td th:text="${itTermin.sala.oznakaSale}"></td>
+					<td th:text="${itTermin.trening.naziv}"></td>
+					<td th:text="${#temporals.format(itTermin.datum, 'dd.MM.yyyy. HH:mm')}"></td>
+					<td th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'korisnik'}">
+					<form method="post" action="Korpa/Create" th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'korisnik'}">
+						<input type="hidden" name="terminId" th:value="${itTermin.id}"/>
+						<input type="hidden" name="treningId" th:value="${itTermin.trening.id}"/>
+						<input type="hidden" name="cena" th:value="${itTermin.trening.cena}"/>
+						<input type="hidden" name="korisnikId" th:value="${session.prijavljeniKorisnik.korisnickoIme}"/><br>
+						<input type="submit" value="Dodaj u korpu"/>
+					</form>
+					</td>
+			</tr>
+		</table>
+		<ul>
+			<li th:if="${session.prijavljeniKorisnik != null and session.prijavljeniKorisnik.uloga == 'administrator'}"><a th:href="|Termin/Create?id=${trening.id}|">dodavanje termina</a></li>
+		</ul>
+</body>
+</html>
